@@ -22,30 +22,30 @@ It keeps the required model (`gpt-3.5-turbo`) and improves output quality with b
 
 ```mermaid
 flowchart TD
-    U[User] --> CLI[CLI App<br/>story_generator.py]
-    CLI --> N[Request Normalizer<br/>normalize_user_request]
-    N -->|Normalization prompt| M[(OpenAI gpt-3.5-turbo)]
+    U[User] --> CLI[CLI app story_generator.py]
+    CLI --> N[Request normalizer normalize_user_request]
+    N -->|Normalization prompt| M[OpenAI API gpt 3.5 turbo]
     M --> N
     N --> B[StoryBrief]
 
-    B --> O[Orchestrator<br/>generate_story_with_judge_loop]
-    O --> S[Storyteller<br/>generate_story_draft]
-    S -->|Story prompt (+ optional feedback)| M
+    B --> O[Orchestrator generate_story_with_judge_loop]
+    O --> S[Storyteller generate_story_draft]
+    S -->|Story prompt with feedback| M
     M --> S
     S --> D[StoryDraft]
 
-    D --> J[Judge<br/>evaluate_story_draft]
-    J -->|Judge rubric prompt| M
+    D --> J[Judge evaluate_story_draft]
+    J -->|Judge prompt| M
     M --> J
     J --> R[RubricScore]
-
-    R --> T{Pass threshold?<br/>safety>=4<br/>coherence>=4<br/>avg>=4.0}
+    R --> P[Rule safety ge four coherence ge four average ge four]
+    P --> T{Pass threshold met}
     T -->|Yes| F[Final Story]
-    T -->|No + retries left| FB[Format failing feedback]
+    T -->|No and retries left| FB[Format failing feedback]
     FB --> O
-    T -->|No + retries exhausted| BEST[Return best attempt + disclaimer]
+    T -->|No and retries exhausted| BEST[Return best attempt with disclaimer]
 
-    F --> REV{User wants revision?}
+    F --> REV{User wants revision}
     BEST --> REV
     REV -->|Yes| HR[handle_user_revision]
     HR -->|Revision prompt| M
