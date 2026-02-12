@@ -57,7 +57,7 @@ The scope is designed for a short focused implementation, with property-based te
   - **Property 3: Rubric Score Structure Invariant**
   - **Validates: Requirements 3.1, 3.2, 3.3**
 
-- [ ] 3. Implement Storyteller generation logic
+- [x] 3. Implement Storyteller generation logic
   - [x] 3.1 Create storyteller.py with normalize_user_request() function
     - Use call_model() to infer bedtime_goal from user input
     - Set age_band to (5, 10) and target_length to (450, 700)
@@ -73,11 +73,11 @@ The scope is designed for a short focused implementation, with property-based te
     - Calculate word_count
     - _Requirements: 2.1, 2.2, 2.6, 2.7, 8.1_
 
-- [ ] 3.3 Write property test for story brief structure
+- [x] 3.3 Write property test for story brief structure
   - **Property 1: Story Brief Structure Invariant**
   - **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5**
 
-- [ ] 3.4 Write property test for story draft structure
+- [x] 3.4 Write property test for story draft structure
   - **Property 2: Story Draft Structure Invariant**
   - **Validates: Requirements 2.1, 2.2**
 
@@ -144,7 +144,7 @@ The scope is designed for a short focused implementation, with property-based te
   - **Property 12: Safety Invariant for Passing Stories**
   - **Validates: Requirements 8.5**
 
-- [ ] 5.12 Write property test for revision re-evaluation
+- [x] 5.12 Write property test for revision re-evaluation
   - **Property 13: Revision Re-evaluation**
   - **Validates: Requirements 6.3, 6.4, 6.5, 6.7**
 
@@ -170,7 +170,7 @@ The scope is designed for a short focused implementation, with property-based te
     - Support exactly one revision per session
     - _Requirements: 6.1, 6.2, 6.6_
 
-- [ ] 8. Final integration and polish
+- [x] 8. Final integration and polish
   - [x] 8.1 Add if __name__ == "__main__" guard to story_generator.py
     - Ensure script can be run directly
     - _Requirements: 10.1_
@@ -180,13 +180,13 @@ The scope is designed for a short focused implementation, with property-based te
     - Test that call_model() from main.py is accessible
     - _Requirements: 10.1, 10.2_
   
-  - [ ] 8.3 Test with sample prompts
+- [x] 8.3 Test with sample prompts
     - Run with "A story about a girl named Alice and her best friend Bob, who happens to be a cat."
     - Verify story generation, evaluation, and output display
     - Test revision workflow with a sample revision request
     - _Requirements: All_
 
-- [ ] 9. Final checkpoint - Complete system verification
+- [x] 9. Final checkpoint - Complete system verification
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

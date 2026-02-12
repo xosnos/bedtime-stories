@@ -18,7 +18,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from models import StoryBrief, StoryDraft, RubricScore, GenerationResult
 from judge import parse_rubric_score, create_default_failing_score
-from orchestrator import generate_story_with_judge_loop
+from orchestrator import generate_story_with_judge_loop, handle_user_revision
+from storyteller import normalize_user_request, generate_story_draft
 
 
 # ---------------------------------------------------------------------------
@@ -77,6 +78,66 @@ def _build_judge_response(
         f"LANGUAGE_SIMPLICITY: {language_simplicity}\n"
         f"LANGUAGE_SIMPLICITY_FEEDBACK: Language is simple enough.\n"
     )
+
+
+# ===========================================================================
+# Property 1: Story Brief Structure
+# Feature: bedtime-story-judge-loop, Property 1: Story Brief Structure
+# Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5
+# ===========================================================================
+
+@given(
+    user_input=st.text(min_size=1, max_size=300),
+    bedtime_goal=st.text(min_size=1, max_size=40),
+)
+@settings(max_examples=100)
+def test_story_brief_structure_invariant(user_input: str, bedtime_goal: str):
+    """normalize_user_request() preserves input and sets fixed structural fields."""
+    assume("\n" not in bedtime_goal)
+    assume(len(bedtime_goal.strip()) > 0)
+
+    with patch("storyteller.call_model", return_value=bedtime_goal):
+        brief = normalize_user_request(user_input)
+
+    assert isinstance(brief, StoryBrief)
+    assert brief.user_request == user_input
+    assert brief.bedtime_goal == bedtime_goal.strip()
+    assert len(brief.bedtime_goal) > 0
+    assert brief.age_band == (5, 10)
+    assert brief.target_length == (450, 700)
+
+
+# ===========================================================================
+# Property 2: Story Draft Structure
+# Feature: bedtime-story-judge-loop, Property 2: Story Draft Structure
+# Validates: Requirements 2.1, 2.2
+# ===========================================================================
+
+@given(
+    title=st.text(min_size=1, max_size=80),
+    words=st.lists(st.text(min_size=1, max_size=12), min_size=1, max_size=300),
+    feedback=st.one_of(st.none(), st.text(min_size=1, max_size=200)),
+)
+@settings(max_examples=100)
+def test_story_draft_structure_invariant(title: str, words: list[str], feedback: str | None):
+    """generate_story_draft() returns non-empty title/text and consistent word_count."""
+    assume("\n" not in title)
+    assume("Title:" not in title)
+    assume(len(title.strip()) > 0)
+    assume(all("\n" not in w for w in words))
+
+    story_text = " ".join(words)
+    model_output = f"Title: {title}\n\n{story_text}"
+    brief = _make_brief()
+
+    with patch("storyteller.call_model", return_value=model_output):
+        draft = generate_story_draft(brief, feedback=feedback)
+
+    assert isinstance(draft, StoryDraft)
+    assert len(draft.title) > 0
+    assert len(draft.story_text) > 0
+    assert draft.word_count == len(draft.story_text.split())
+    assert draft.rubric_score is None
 
 
 # ===========================================================================
@@ -434,3 +495,49 @@ def test_safety_invariant(safety, age_fit, coherence, engagement, language_simpl
 
     if result.passed_threshold:
         assert result.final_draft.rubric_score.safety >= 4
+
+
+# ===========================================================================
+# Property 13: Revision Re-evaluation
+# Feature: bedtime-story-judge-loop, Property 13: Revision Re-evaluation
+# Validates: Requirements 6.3, 6.4, 6.5, 6.7
+# ===========================================================================
+
+@given(data=rubric_score_strategy)
+@settings(max_examples=100)
+def test_revision_re_evaluation(data: RubricScore):
+    """handle_user_revision() re-evaluates revised text and updates result metadata."""
+    previous_score = create_default_failing_score()
+    previous_draft = StoryDraft(
+        title="Original",
+        story_text="A calm story about bedtime.",
+        word_count=5,
+        rubric_score=previous_score,
+    )
+    previous_result = GenerationResult(
+        final_draft=previous_draft,
+        all_attempts=[(previous_draft, previous_score)],
+        retry_count=0,
+        passed_threshold=False,
+        disclaimer="Note: fallback",
+        judge_parse_failures=0,
+        revision_used=False,
+    )
+
+    revised_output = "Title: Revised Story\n\nA gentler revised bedtime tale."
+    brief = _make_brief()
+
+    with patch("orchestrator.call_model", return_value=revised_output), \
+         patch("orchestrator.evaluate_story_draft", return_value=data):
+        revised_result = handle_user_revision(
+            previous_result,
+            revision_request="Please make it calmer and shorter.",
+            brief=brief,
+        )
+
+    assert revised_result.revision_used is True
+    assert len(revised_result.all_attempts) == len(previous_result.all_attempts) + 1
+    assert revised_result.final_draft.rubric_score == data
+    assert revised_result.all_attempts[-1][1] == data
+    assert revised_result.passed_threshold == data.meets_threshold()
+    assert revised_result.retry_count == previous_result.retry_count + 1
