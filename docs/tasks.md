@@ -8,63 +8,63 @@ The scope is designed for a short focused implementation, with property-based te
 
 ## Tasks
 
-- [ ] 1. Create data models and core data structures
+- [x] 1. Create data models and core data structures
   - Create models.py with StoryBrief, RubricScore, StoryDraft, and GenerationResult dataclasses
   - Implement average_score() and meets_threshold() methods on RubricScore
   - Ensure all dataclasses use proper type hints and Optional where needed
   - _Requirements: 1.1, 3.1, 3.2, 5.1, 5.2, 5.3, 5.4, 5.5, 9.1, 9.2, 9.3_
 
-- [ ] 1.1 Write unit tests for RubricScore methods
+- [x] 1.1 Write unit tests for RubricScore methods
   - Test average_score() calculation with various score combinations
   - Test meets_threshold() with boundary cases (safety=3/4, coherence=3/4, average=3.9/4.0)
   - Test meets_threshold() returns True only when all three conditions met
   - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
 
-- [ ] 1.2 Write property test for threshold logic
+- [x] 1.2 Write property test for threshold logic
   - **Property 5: Threshold Logic Correctness**
   - **Validates: Requirements 5.1, 5.2, 5.3, 5.5**
 
-- [ ] 1.3 Write property test for average calculation
+- [x] 1.3 Write property test for average calculation
   - **Property 4: Average Score Calculation**
   - **Validates: Requirements 5.4**
 
-- [ ] 2. Implement Judge evaluation logic
-  - [ ] 2.1 Create judge.py with evaluate_story_draft() function
+- [x] 2. Implement Judge evaluation logic
+  - [x] 2.1 Create judge.py with evaluate_story_draft() function
     - Build judge prompt with 5-dimension rubric (safety, age_fit, coherence, engagement, language_simplicity)
     - Use call_model() from main.py with temperature=0.1 for consistent evaluation
     - Return None if parsing fails (for retry handling)
     - _Requirements: 3.1, 3.2, 3.3, 3.10_
   
-  - [ ] 2.2 Implement parse_rubric_score() function
+  - [x] 2.2 Implement parse_rubric_score() function
     - Parse judge response into RubricScore dataclass
     - Extract scores (1-5) and feedback text for all five dimensions
     - Raise exception if parsing fails
     - _Requirements: 3.1, 3.2, 3.3_
   
-  - [ ] 2.3 Implement create_default_failing_score() function
+  - [x] 2.3 Implement create_default_failing_score() function
     - Return RubricScore with all dimensions = 3
     - Set all feedback fields to "Judge evaluation failed to parse"
     - _Requirements: 7.2_
 
-- [ ] 2.4 Write unit tests for judge parsing
+- [x] 2.4 Write unit tests for judge parsing
   - Test parse_rubric_score() with valid judge response format
   - Test parse_rubric_score() raises exception on missing fields
   - Test parse_rubric_score() raises exception on out-of-range scores
   - Test create_default_failing_score() returns all dimensions = 3
   - _Requirements: 3.1, 3.2, 3.3, 7.2_
 
-- [ ] 2.5 Write property test for rubric score structure
+- [x] 2.5 Write property test for rubric score structure
   - **Property 3: Rubric Score Structure Invariant**
   - **Validates: Requirements 3.1, 3.2, 3.3**
 
 - [ ] 3. Implement Storyteller generation logic
-  - [ ] 3.1 Create storyteller.py with normalize_user_request() function
+  - [x] 3.1 Create storyteller.py with normalize_user_request() function
     - Use call_model() to infer bedtime_goal from user input
     - Set age_band to (5, 10) and target_length to (450, 700)
     - Preserve original user_request unchanged
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
   
-  - [ ] 3.2 Implement generate_story_draft() function
+  - [x] 3.2 Implement generate_story_draft() function
     - Build storyteller prompt with strict safety constraints
     - Include age_band, bedtime_goal, target_length from StoryBrief
     - Optionally include judge feedback for retry attempts
@@ -81,11 +81,11 @@ The scope is designed for a short focused implementation, with property-based te
   - **Property 2: Story Draft Structure Invariant**
   - **Validates: Requirements 2.1, 2.2**
 
-- [ ] 4. Checkpoint - Verify core components work independently
+- [x] 4. Checkpoint - Verify core components work independently
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement orchestration logic
-  - [ ] 5.1 Create orchestrator.py with generate_story_with_judge_loop() function
+- [x] 5. Implement orchestration logic
+  - [x] 5.1 Create orchestrator.py with generate_story_with_judge_loop() function
     - Implement bounded retry loop (max 3 attempts)
     - Generate draft, evaluate with judge, check threshold
     - Handle judge parse failures with single retry and default scores
@@ -95,13 +95,13 @@ The scope is designed for a short focused implementation, with property-based te
     - Track all attempts and judge_parse_failures count
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 7.1, 7.2, 7.3, 7.4_
   
-  - [ ] 5.2 Implement format_judge_feedback() function
+  - [x] 5.2 Implement format_judge_feedback() function
     - Format RubricScore into actionable feedback text
     - Include only dimensions with score < 4
     - Format as "DIMENSION (score X): feedback text"
     - _Requirements: 4.4_
   
-  - [ ] 5.3 Implement handle_user_revision() function
+  - [x] 5.3 Implement handle_user_revision() function
     - Build revision prompt with original story and user request
     - Include safety constraints in revision prompt
     - Generate revised draft using call_model()
@@ -110,37 +110,37 @@ The scope is designed for a short focused implementation, with property-based te
     - Return new GenerationResult with updated attempts list
     - _Requirements: 6.2, 6.3, 6.4, 6.5, 6.7, 8.3_
 
-- [ ] 5.4 Write unit tests for feedback formatting
+- [x] 5.4 Write unit tests for feedback formatting
   - Test format_judge_feedback() with all scores >= 4 (empty feedback)
   - Test format_judge_feedback() with mixed scores (partial feedback)
   - Test format_judge_feedback() with all scores < 4 (full feedback)
   - _Requirements: 4.4_
 
-- [ ] 5.5 Write property test for bounded retry invariant
+- [x] 5.5 Write property test for bounded retry invariant
   - **Property 6: Bounded Retry Invariant**
   - **Validates: Requirements 4.1**
 
-- [ ] 5.6 Write property test for early exit behavior
+- [x] 5.6 Write property test for early exit behavior
   - **Property 7: Early Exit on Pass**
   - **Validates: Requirements 4.3**
 
-- [ ] 5.7 Write property test for best draft selection
+- [x] 5.7 Write property test for best draft selection
   - **Property 8: Best Draft Selection**
   - **Validates: Requirements 4.5**
 
-- [ ] 5.8 Write property test for disclaimer on failure
+- [x] 5.8 Write property test for disclaimer on failure
   - **Property 9: Disclaimer on Failure**
   - **Validates: Requirements 4.6, 9.4**
 
-- [ ] 5.9 Write property test for generation result completeness
+- [x] 5.9 Write property test for generation result completeness
   - **Property 10: Generation Result Completeness**
   - **Validates: Requirements 4.7, 9.1, 9.2, 9.3, 9.5**
 
-- [ ] 5.10 Write property test for parse failure handling
+- [x] 5.10 Write property test for parse failure handling
   - **Property 11: Parse Failure Handling**
   - **Validates: Requirements 7.1, 7.2, 7.3, 7.4**
 
-- [ ] 5.11 Write property test for safety invariant
+- [x] 5.11 Write property test for safety invariant
   - **Property 12: Safety Invariant for Passing Stories**
   - **Validates: Requirements 8.5**
 
@@ -148,11 +148,11 @@ The scope is designed for a short focused implementation, with property-based te
   - **Property 13: Revision Re-evaluation**
   - **Validates: Requirements 6.3, 6.4, 6.5, 6.7**
 
-- [ ] 6. Checkpoint - Verify orchestration logic works end-to-end
+- [x] 6. Checkpoint - Verify orchestration logic works end-to-end
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Create CLI interface
-  - [ ] 7.1 Create story_generator.py with main() function
+- [x] 7. Create CLI interface
+  - [x] 7.1 Create story_generator.py with main() function
     - Prompt user for story request
     - Call normalize_user_request() and display brief details
     - Call generate_story_with_judge_loop() with progress message
@@ -161,7 +161,7 @@ The scope is designed for a short focused implementation, with property-based te
     - Display all rubric scores and feedback
     - _Requirements: 1.1, 4.6, 9.1, 9.2, 9.3, 9.4, 9.5_
   
-  - [ ] 7.2 Add user revision workflow to main()
+  - [x] 7.2 Add user revision workflow to main()
     - Prompt user for revision request (yes/no)
     - If yes, accept revision instructions
     - Call handle_user_revision() with progress message
@@ -171,11 +171,11 @@ The scope is designed for a short focused implementation, with property-based te
     - _Requirements: 6.1, 6.2, 6.6_
 
 - [ ] 8. Final integration and polish
-  - [ ] 8.1 Add if __name__ == "__main__" guard to story_generator.py
+  - [x] 8.1 Add if __name__ == "__main__" guard to story_generator.py
     - Ensure script can be run directly
     - _Requirements: 10.1_
   
-  - [ ] 8.2 Verify all imports work correctly
+  - [x] 8.2 Verify all imports work correctly
     - Test that models.py, storyteller.py, judge.py, orchestrator.py import correctly
     - Test that call_model() from main.py is accessible
     - _Requirements: 10.1, 10.2_
