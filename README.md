@@ -22,38 +22,25 @@ It keeps the required model (`gpt-3.5-turbo`) and improves output quality with b
 
 ```mermaid
 flowchart TD
-    U[User] --> CLI[CLI app story_generator.py]
-    CLI --> N[Request normalizer normalize_user_request]
-    N -->|Normalization prompt| M[OpenAI API gpt 3.5 turbo]
-    M --> N
-    N --> B[StoryBrief]
+    U[User request] --> N[Normalize request into story brief]
+    N --> G[Generate story draft]
+    G --> J[Judge draft on safety quality and age fit]
+    J --> D{Meets quality bar?}
 
-    B --> O[Orchestrator generate_story_with_judge_loop]
-    O --> S[Storyteller generate_story_draft]
-    S -->|Story prompt with feedback| M
-    M --> S
-    S --> D[StoryDraft]
+    D -->|Yes| F[Return final story]
+    D -->|No and retries left| FB[Use judge feedback to improve next draft]
+    FB --> G
+    D -->|No and retries exhausted| B[Return best attempt with disclaimer]
 
-    D --> J[Judge evaluate_story_draft]
-    J -->|Judge prompt| M
-    M --> J
-    J --> R[RubricScore]
-    R --> P[Rule safety ge four coherence ge four average ge four]
-    P --> T{Pass threshold met}
-    T -->|Yes| F[Final Story]
-    T -->|No and retries left| FB[Format failing feedback]
-    FB --> O
-    T -->|No and retries exhausted| BEST[Return best attempt with disclaimer]
-
-    F --> REV{User wants revision}
-    BEST --> REV
-    REV -->|Yes| HR[handle_user_revision]
-    HR -->|Revision prompt| M
-    M --> HR
-    HR --> J
-    REV -->|No| OUT[Display result]
-    J --> OUT
+    F --> R{User wants a revision?}
+    B --> R
+    R -->|No| O[Display result]
+    R -->|Yes| V[Apply requested revision and re-judge]
+    V --> J
+    O --> E[End]
 ```
+
+See [docs/system_block_diagram.md](docs/system_block_diagram.md) for a more in-depth view.
 
 ## Prompt Flow Summary
 
@@ -65,13 +52,15 @@ flowchart TD
 
 ## Repository Structure
 
-- `story_generator.py`: primary CLI entry point
-- `main.py`: shared `call_model()` (OpenAI client wrapper)
-- `storyteller.py`: request normalization + story draft generation
-- `judge.py`: rubric evaluation + parser
-- `orchestrator.py`: retry loop, threshold checks, revision flow
-- `models.py`: dataclasses (`StoryBrief`, `StoryDraft`, `RubricScore`, `GenerationResult`)
-- `tests/`: unit + property-style tests
+| Path | Purpose |
+| --- | --- |
+| `story_generator.py` | Primary CLI entry point. |
+| `main.py` | Shared `call_model()` OpenAI client wrapper. |
+| `storyteller.py` | Request normalization and story draft generation. |
+| `judge.py` | Rubric evaluation and parser logic. |
+| `orchestrator.py` | Retry loop, threshold checks, and revision flow. |
+| `models.py` | Dataclasses (`StoryBrief`, `StoryDraft`, `RubricScore`, `GenerationResult`). |
+| `tests/` | Unit and property-style tests. |
 
 ## Setup and Run (venv + install + execute)
 
