@@ -1,9 +1,9 @@
-# Bedtime Stories (Take-Home Assignment)
+# Bedtime Stories 📚✨
 
 This project generates bedtime stories for ages 5-10 using a storyteller + judge loop.
 It keeps the required model (`gpt-3.5-turbo`) and improves output quality with bounded retries and rubric-based feedback.
 
-## What This System Does
+## What This System Does 🌙
 
 1. Takes a free-text story request from the user.
 2. Normalizes it into a `StoryBrief` (bedtime goal, age band, target length).
@@ -18,7 +18,7 @@ It keeps the required model (`gpt-3.5-turbo`) and improves output quality with b
 6. Returns the best draft (with disclaimer if needed).
 7. Supports one optional user revision, then re-runs judge evaluation.
 
-## System Block Diagram
+## System Block Diagram 🧭
 
 ```mermaid
 flowchart TD
@@ -42,7 +42,7 @@ flowchart TD
 
 See [docs/system_block_diagram.md](docs/system_block_diagram.md) for a more in-depth view.
 
-## Prompt Flow Summary
+## Prompt Flow Summary 🔁
 
 - `normalize_user_request` prompt: extracts a concise bedtime goal.
 - `generate_story_draft` prompt: enforces safety policy, age fit, calming tone, and target length.
@@ -50,7 +50,7 @@ See [docs/system_block_diagram.md](docs/system_block_diagram.md) for a more in-d
 - Retry loop: failing dimensions (<4) become feedback for the next storyteller prompt.
 - Revision prompt: applies user change request while preserving safety constraints.
 
-## Repository Structure
+## Repository Structure 🗂️
 
 | Path | Purpose |
 | --- | --- |
@@ -62,7 +62,7 @@ See [docs/system_block_diagram.md](docs/system_block_diagram.md) for a more in-d
 | `models.py` | Dataclasses (`StoryBrief`, `StoryDraft`, `RubricScore`, `GenerationResult`). |
 | `tests/` | Unit and property-style tests. |
 
-## Setup and Run (venv + install + execute)
+## Setup and Run (venv + install + execute) 🛠️
 
 ### 1. Create and activate virtual environment
 
@@ -97,7 +97,7 @@ You can also run the simpler baseline CLI with:
 python main.py
 ```
 
-## Optional: Run Tests
+## Optional: Run Tests ✅
 
 ```bash
 pytest -q
